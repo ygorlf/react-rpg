@@ -1,9 +1,28 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
 
 import sprite from './img/sprite.png';
 import grass from './img/grass.png';
 import dirt3 from './img/dirt3.png';
+
+// Redux
+import { updatePosition } from './redux/game-reducer';
+
+const mapStateToProps = state => {
+  return {
+    position: state.game.position,
+    positionPerson: state.game.positionPerson
+  }
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    updatePosition: (info) => {
+      dispatch(updatePosition(info));
+    }
+  };
+}
 
 const Container = styled.div`
   display: flex;
@@ -19,6 +38,11 @@ const Container = styled.div`
   background-size: 140px;
 `;
 
+const Title = styled.h1`
+  color: #000;
+  font: 700 1rem 'Open Sans', sans-serif;
+`;
+
 const Map = styled.div`
   position: relative;
   width: 700px;
@@ -27,7 +51,7 @@ const Map = styled.div`
   background-repeat: repeat, repeat;
   background-size: 30px;
   outline: none;
-  animation: gradient 15s ease infinite;
+  // animation: gradient 15s ease infinite;
 
   @keyframes gradient {
 	0% {
@@ -57,14 +81,11 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      position: [0, 0],
-      positionPerson: '0 0',
-    };
+    this.state = {};
   }
 
   handleUp = (ev) => {
-    const { position } = this.state;
+    const { position } = this.props;
 
     const firstPosition = position[0];
     const secondPosition = position[position.length - 1];
@@ -73,54 +94,58 @@ class App extends Component {
       case 38:
       case 56:
       case 87:
-      case 104:
-        return this.setState({
+      case 104: {
+        return this.props.updatePosition({
           position:
             [firstPosition, (secondPosition > 1)
               ? secondPosition - 35
               : secondPosition],
           positionPerson: '0 -73px',
         })
+      }
       case 37:
       case 52:
       case 65:
-      case 100:
-        return this.setState({
+      case 100: {
+        return this.props.updatePosition({
           position:
             [(firstPosition > 1)
               ? firstPosition - 35
               : firstPosition, secondPosition],
           positionPerson: '0 37px',
         })
+      }
       case 40:
       case 50:
       case 83:
-      case 98:
-        return this.setState({
+      case 98: {
+        return this.props.updatePosition({
           position:
             [firstPosition, (secondPosition > 660)
               ? secondPosition
               : secondPosition + 35],
           positionPerson: '0 0',
         })
+      }
       case 39:
       case 54:
       case 68:
-      case 102:
-        return this.setState({
+      case 102: {
+        return this.props.updatePosition({
           position:
             [(firstPosition > 660)
               ? firstPosition
               : firstPosition + 35, secondPosition],
           positionPerson: '0 -37px',
         })
+      }
       default:
         return 0
     }
   }
 
   render() {
-    const { position, positionPerson } = this.state;
+    const { position, positionPerson } = this.props;
 
     return (
       <Container autofocus="autofocus" tabIndex="1" onKeyUp={(ev) => this.handleUp(ev)}>
@@ -132,4 +157,5 @@ class App extends Component {
   }
 }
 
-export default App;
+// export default connect(funcao mapstate, função map dispatch)(nome da classe);
+export default connect(mapStateToProps, mapDispatchToProps)(App);
